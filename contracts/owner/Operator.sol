@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.2;
 
 import '@openzeppelin/contracts/GSN/Context.sol';
@@ -23,7 +24,7 @@ contract Operator is Context, Ownable {
         return _operator;
     }
 
-    modifier onlyMiner(){
+    modifier onlyMinter(){
         require(miners[_msgSender()],"MinterRole: caller does not have the Minter role or above");
         _;
     }

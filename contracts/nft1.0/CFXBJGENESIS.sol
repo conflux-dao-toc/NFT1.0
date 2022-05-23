@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.2;
 pragma experimental ABIEncoderV2;
 
@@ -9,7 +10,7 @@ import "../owner/Operator.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract CFXBJGENESIS2021 is ERC1155, Operator {
-    event CFXBJGENESISMint(address _onwer, uint256 _tokenId, string metedate);
+    event CFXBJGENESISMint(address _onwer, uint256 _tokenId, string metedata);
 
     using Counters for Counters.Counter;
     //tokenid自增一
@@ -38,8 +39,8 @@ contract CFXBJGENESIS2021 is ERC1155, Operator {
 
     mapping(uint256 => address[]) public ownerOfAddress;
 
-    //tokenId => metadate
-    mapping(uint256 => string) public tokenMetaDate;
+    //tokenId => metadata
+    mapping(uint256 => string) public tokenMetaData;
 
     uint256 public price = 5e18;
 
@@ -90,9 +91,9 @@ contract CFXBJGENESIS2021 is ERC1155, Operator {
         return _ownedTokens[_owner];
     }
 
-    //根据tokenId 获取 metadate
+    //根据tokenId 获取 metadata
     function uri(uint256 _id) external view override returns (string memory) {
-        return StringUtils.strConcat(baseUri, tokenMetaDate[_id]);
+        return StringUtils.strConcat(baseUri, tokenMetaData[_id]);
     }
 
     /**
@@ -157,22 +158,22 @@ contract CFXBJGENESIS2021 is ERC1155, Operator {
         _allTokens.push(tokenId);
     }
 
-    function mint(string memory _metadateUri) public onlyOwner{
+    function mint(string memory _metadataUri) public onlyOwner{
         //require(msg.value == price, "Value error");
-        _tsMint(msg.sender, _metadateUri);
+        _tsMint(msg.sender, _metadataUri);
     }
 
-    function addItem(address _to, string memory _metadateUri)
+    function addItem(address _to, string memory _metadataUri)
         public
-        onlyMiner()
+        onlyMinter()
     {
-        _tsMint(_to, _metadateUri);
+        _tsMint(_to, _metadataUri);
     }
 
     //chy:tspace批量铸造方法，使用默认地址+id.json的方法，直接铸造amount个新的nft。
     function batchAddItemByNumber(address _to, uint256 _amount)
         public
-        onlyMiner()
+        onlyMinter()
     {
         uint256 newItemId = _tokenIds.current()+1;
         for (uint i = 0; i < _amount; i++) {
@@ -183,7 +184,7 @@ contract CFXBJGENESIS2021 is ERC1155, Operator {
     function batchAddItemByAddress(
         address[] calldata _initialOwners,
         string[] calldata _uris
-    ) public onlyMiner() {
+    ) public onlyMinter() {
         require(_initialOwners.length == _uris.length, "uri length mismatch");
         
         uint256 _length = _uris.length;
@@ -192,19 +193,19 @@ contract CFXBJGENESIS2021 is ERC1155, Operator {
         }
     }
 
-    function _tsMint(address _to, string memory _metadateUri) internal {
+    function _tsMint(address _to, string memory _metadataUri) internal {
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
-        tokenMetaDate[newItemId] = _metadateUri;                                            
+        tokenMetaData[newItemId] = _metadataUri;                                            
         _mint(
             _to,
             newItemId,
             1,
-            bytes(StringUtils.strConcat(baseUri, _metadateUri))
+            bytes(StringUtils.strConcat(baseUri, _metadataUri))
         );
         _addTokenToAllTokensEnumeration(newItemId);
         _addTokenToOwnerEnumeration(_to, newItemId);
-        emit CFXBJGENESISMint(_to, newItemId, _metadateUri);
+        emit CFXBJGENESISMint(_to, newItemId, _metadataUri);
     }
 
     receive() external payable {}
