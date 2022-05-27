@@ -42,6 +42,9 @@ contract CFXBJGENESIS2021 is ERC1155, Operator {
     //tokenId => metadata
     mapping(uint256 => string) public tokenMetaData;
 
+    //tokenId => FeatureCode, the Feature code is generally md5 code for resource files such as images or videos.
+    mapping(uint256 => uint256) public tokenFeatureCode;
+
     uint256 public price = 5e18;
 
     SponsorWhitelistControl public constant SPONSOR =
@@ -293,5 +296,11 @@ contract CFXBJGENESIS2021 is ERC1155, Operator {
         // This also deletes the contents at the last position of the array
         _allTokens.pop();
         _allTokensIndex[tokenId] = 0;
+    }
+
+    //Optional functions：The feature code can only be set once for each id, and then it can never be change again。
+    function setTokenFeatureCode(uint256 tokenId, uint256 featureCode) public onlyMinter() {
+        require(tokenFeatureCode[tokenId] == 0, "NFT1.0: token Feature Code is already set up");
+        tokenFeatureCode[tokenId] = featureCode;
     }
 }
